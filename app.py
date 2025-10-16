@@ -1,4 +1,4 @@
-# app.py - ANÁLISIS MAN CITY vs NAPOLI - VERSIÓN FUNCIONANDO
+# app.py - Análisis Manchester City vs Napoli - VERSIÓN FUNCIONAL
 import streamlit as st
 import pandas as pd
 import numpy as np
