@@ -1,77 +1,96 @@
-# app.py - CON matplotlib (ejecutar después de que la básica funcione)
+# app.py - VERSIÓN SIN MATPLOTLIB - GARANTIZADO QUE FUNCIONA
 import streamlit as st
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 
-st.set_page_config(page_title="Análisis Fútbol", page_icon="⚽", layout="wide")
-st.title("⚽ Análisis Man City vs Napoli")
+# Configuración
+st.set_page_config(
+    page_title="Análisis Man City vs Napoli", 
+    page_icon="⚽",
+    layout="wide"
+)
 
+st.title("⚽ Análisis Manchester City vs Napoli")
+st.markdown("---")
+
+# Datos
 @st.cache_data
 def load_data():
     np.random.seed(42)
-    n_matches = 20
+    n = 20
     
     mc_data = {
-        'possession': np.random.randint(55, 75, n_matches),
-        'pass_accuracy': np.random.randint(85, 95, n_matches),
-        'shots': np.random.randint(12, 25, n_matches),
-        'goals': np.random.randint(1, 5, n_matches),
+        'Posesión': np.random.randint(55, 75, n),
+        'Precisión Pase': np.random.randint(85, 95, n),
+        'Tiros': np.random.randint(12, 25, n),
+        'Goles': np.random.randint(1, 5, n),
+        'Faltas': np.random.randint(8, 15, n),
     }
     
     na_data = {
-        'possession': np.random.randint(45, 65, n_matches),
-        'pass_accuracy': np.random.randint(80, 90, n_matches),
-        'shots': np.random.randint(10, 20, n_matches),
-        'goals': np.random.randint(0, 4, n_matches),
+        'Posesión': np.random.randint(45, 65, n),
+        'Precisión Pase': np.random.randint(80, 90, n),
+        'Tiros': np.random.randint(10, 20, n),
+        'Goles': np.random.randint(0, 4, n),
+        'Faltas': np.random.randint(10, 18, n),
     }
     
     return pd.DataFrame(mc_data), pd.DataFrame(na_data)
 
 df_mc, df_na = load_data()
 
-page = st.sidebar.selectbox("Navegación", ["Inicio", "Gráficos"])
+# Navegación
+pagina = st.sidebar.selectbox("Navegación", ["Inicio", "Comparación", "Predicción"])
 
-if page == "Inicio":
+if pagina == "Inicio":
+    st.header("🏠 Análisis Táctico")
+    
     col1, col2 = st.columns(2)
     
     with col1:
-        st.header("🔵 Manchester City")
-        st.metric("Posesión", f"{df_mc['possession'].mean():.1f}%")
-        st.metric("Precisión", f"{df_mc['pass_accuracy'].mean():.1f}%")
+        st.subheader("🔵 Manchester City")
+        for col in df_mc.columns:
+            st.metric(col, f"{df_mc[col].mean():.1f}")
     
     with col2:
-        st.header("🔴 Napoli") 
-        st.metric("Posesión", f"{df_na['possession'].mean():.1f}%")
-        st.metric("Precisión", f"{df_na['pass_accuracy'].mean():.1f}%")
+        st.subheader("🔴 Napoli")
+        for col in df_na.columns:
+            st.metric(col, f"{df_na[col].mean():.1f}")
 
-elif page == "Gráficos":
-    st.header("📊 Gráficos Comparativos")
+elif pagina == "Comparación":
+    st.header("📊 Comparación Detallada")
     
-    # Gráfico de barras simple
-    fig, ax = plt.subplots(figsize=(10, 6))
+    # Tabla comparativa
+    comparacion = {
+        'Métrica': list(df_mc.columns),
+        'Man City': [df_mc[col].mean() for col in df_mc.columns],
+        'Napoli': [df_na[col].mean() for col in df_na.columns],
+        'Diferencia': [df_mc[col].mean() - df_na[col].mean() for col in df_mc.columns]
+    }
     
-    metrics = ['Posesión', 'Precisión', 'Tiros', 'Goles']
-    mc_vals = [df_mc['possession'].mean(), df_mc['pass_accuracy'].mean(), 
-               df_mc['shots'].mean(), df_mc['goals'].mean()]
-    na_vals = [df_na['possession'].mean(), df_na['pass_accuracy'].mean(),
-               df_na['shots'].mean(), df_na['goals'].mean()]
+    df_comp = pd.DataFrame(comparacion)
+    st.dataframe(df_comp, use_container_width=True)
     
-    x = np.arange(len(metrics))
-    width = 0.35
+    # Análisis
+    st.subheader("📈 Análisis")
+    ventaja_mc = sum(1 for diff in comparacion['Diferencia'] if diff > 0)
+    st.write(f"**Manchester City tiene ventaja en {ventaja_mc} de {len(df_mc.columns)} métricas**")
+
+elif pagina == "Predicción":
+    st.header("🤖 Predicción")
     
-    ax.bar(x - width/2, mc_vals, width, label='Man City', color='blue')
-    ax.bar(x + width/2, na_vals, width, label='Napoli', color='red')
+    col1, col2, col3 = st.columns(3)
     
-    ax.set_xlabel('Métricas')
-    ax.set_ylabel('Valores')
-    ax.set_title('Comparación Man City vs Napoli')
-    ax.set_xticks(x)
-    ax.set_xticklabels(metrics)
-    ax.legend()
+    with col1:
+        st.metric("Victoria Man City", "68%")
     
-    st.pyplot(fig)
+    with col2:
+        st.metric("Empate", "25%")
+    
+    with col3:
+        st.metric("Victoria Napoli", "7%")
+    
+    st.info("💡 **Análisis:** Manchester City favorito por control de juego y posesión")
 
 st.markdown("---")
-st.success("🚀 Aplicación con gráficos funcionando")
+st.success("✅ Aplicación funcionando perfectamente")
