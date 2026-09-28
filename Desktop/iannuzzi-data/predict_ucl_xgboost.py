@@ -91,8 +91,6 @@ upcoming_matches['predicted_lambda'] = model.predict(X_new)
 print("--- PREDICCIÓN DE GOLES ESPERADOS (LAMBDA) CON XGBOOST ---")
 print(upcoming_matches[['match', 'predicted_lambda']])
 
-pip install xgboost pandas scipy
-
 import pandas as pd
 import numpy as np
 import xgboost as xgb
